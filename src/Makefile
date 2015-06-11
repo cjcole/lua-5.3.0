@@ -13,6 +13,7 @@ LIBS= -lm $(SYSLIBS) $(MYLIBS)
 
 AR= ar rcu
 RANLIB= ranlib
+DYLIB= g++ -dynamiclib -compatibility_version 5.3.0 -current_version 5.3.0 -undefined suppress -flat_namespace -o
 RM= rm -f
 
 SYSCFLAGS=
@@ -29,6 +30,7 @@ MYOBJS=
 PLATS= aix bsd c89 freebsd generic linux macosx mingw posix solaris
 
 LUA_A=	liblua.a
+LUA_DY=	liblua.dylib
 CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
 	ltm.o lundump.o lvm.o lzio.o
@@ -43,8 +45,8 @@ LUAC_T=	luac
 LUAC_O=	luac.o
 
 ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
-ALL_A= $(LUA_A)
+ALL_T= $(LUA_A) $(LUA_DY) $(LUA_T) $(LUAC_T)
+ALL_A= $(LUA_A) $(LUA_DY)
 
 # Targets start here.
 default: $(PLAT)
@@ -58,6 +60,9 @@ a:	$(ALL_A)
 $(LUA_A): $(BASE_O)
 	$(AR) $@ $(BASE_O)
 	$(RANLIB) $@
+
+$(LUA_DY): $(CORE_O) $(LIB_O)
+	$(DYLIB) $@ $(CORE_O) $(LIB_O)
 
 $(LUA_T): $(LUA_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(LUA_O) $(LUA_A) $(LIBS)
