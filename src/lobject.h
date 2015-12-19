@@ -535,6 +535,9 @@ LUAI_FUNC const char *luaO_pushvfstring (lua_State *L, const char *fmt,
 LUAI_FUNC const char *luaO_pushfstring (lua_State *L, const char *fmt, ...);
 LUAI_FUNC void luaO_chunkid (char *out, const char *source, size_t len);
 
+#ifdef LUA_NO_REAL
+lua_Integer lua_pow_no_real (lua_Integer base, lua_Integer exp);
+#endif
 
 #endif
 

@@ -73,6 +73,23 @@ int luaO_ceillog2 (unsigned int x) {
 }
 
 
+#ifdef LUA_NO_REAL
+lua_Integer lua_pow_no_real (lua_Integer base, lua_Integer exp) {
+    lua_Integer result = 1;
+
+    while (exp)
+    {
+        if (exp & 1)
+            result *= base;
+        exp >>= 1;
+        base *= base;
+    }
+
+    return result;
+}
+#endif
+
+
 static lua_Integer intarith (lua_State *L, int op, lua_Integer v1,
                                                    lua_Integer v2) {
   switch (op) {

@@ -99,6 +99,9 @@ static int numisinteger (lua_Number x, lua_Integer *p) {
 ** hash for floating-point numbers
 */
 static Node *hashfloat (const Table *t, lua_Number n) {
+#ifdef LUA_NO_REAL
+  return hashint(t, (lua_Integer)n);
+#else
   int i;
   n = l_mathop(frexp)(n, &i) * cast_num(INT_MAX - DBL_MAX_EXP);
   i += cast_int(n);
@@ -108,6 +111,7 @@ static Node *hashfloat (const Table *t, lua_Number n) {
     i = -i;  /* must be a positive value */
   }
   return hashmod(t, i);
+#endif
 }
 
 
