@@ -96,6 +96,18 @@
 
 
 /*
+@@ LUA_NO_REAL turns off real numbers
+*/
+#define LUA_NO_REAL
+
+
+/*
+@@ LUA_SANDBOX turns on the sandbox
+*/
+#define LUA_SANDBOX
+
+
+/*
 @@ LUA_INT_INT / LUA_INT_LONG / LUA_INT_LONGLONG defines the type for
 ** Lua integers.
 @@ LUA_REAL_FLOAT / LUA_REAL_DOUBLE / LUA_REAL_LONGDOUBLE defines
@@ -116,21 +128,27 @@
 #else  /* otherwise use 'long' */
 #define LUA_INT_LONG
 #endif
+#ifndef LUA_NO_REAL
 #define LUA_REAL_FLOAT
+#endif
 
 #elif defined(LUA_C89_NUMBERS)	/* }{ */
 /*
 ** largest types available for C89 ('long' and 'double')
 */
 #define LUA_INT_LONG
+#ifndef LUA_NO_REAL
 #define LUA_REAL_DOUBLE
+#endif
 
 #else				/* }{ */
 /*
 ** default configuration for 64-bit Lua ('long long' and 'double')
 */
 #define LUA_INT_LONGLONG
+#ifndef LUA_NO_REAL
 #define LUA_REAL_DOUBLE
+#endif
 
 #endif								/* } */
 
@@ -440,6 +458,20 @@
 
 #define lua_str2number(s,p)	strtod((s), (p))
 
+#elif defined(LUA_NO_REAL)		/* }{ */
+
+#define LUA_NUMBER	LUA_INTEGER
+
+#define LUAI_UACNUMBER	LUAI_UACINT
+
+#define LUA_NUMBER_FRMLEN       LUA_INTEGER_FRMLEN
+#define LUA_NUMBER_FMT		LUA_INTEGER_FMT
+
+#define l_mathop(op)		op
+
+#define lua_str2number(s,p) lua_str2integer(s,p)
+#define lua_strx2number(s,p) lua_strx2integer(s,p)
+
 #else					/* }{ */
 
 #error "numeric real type not defined"
@@ -603,7 +635,9 @@
 ** implementation.
 */
 #if !defined(LUA_USE_C89)
+#if !defined(lua_strx2number)
 #define lua_strx2number(s,p)	lua_str2number(s,p)
+#endif
 #endif
 
 

@@ -170,6 +170,7 @@ static int luaB_rawset (lua_State *L) {
 }
 
 
+#ifndef LUA_SANDBOX
 static int luaB_collectgarbage (lua_State *L) {
   static const char *const opts[] = {"stop", "restart", "collect",
     "count", "step", "setpause", "setstepmul",
@@ -196,7 +197,7 @@ static int luaB_collectgarbage (lua_State *L) {
     }
   }
 }
-
+#endif
 
 /*
 ** This function has all type names as upvalues, to maximize performance.
@@ -283,6 +284,7 @@ static int luaB_ipairs (lua_State *L) {
 }
 
 
+#ifndef LUA_SANDBOX
 static int load_aux (lua_State *L, int status, int envidx) {
   if (status == LUA_OK) {
     if (envidx != 0) {  /* 'env' parameter? */
@@ -298,8 +300,10 @@ static int load_aux (lua_State *L, int status, int envidx) {
     return 2;  /* return nil plus error message */
   }
 }
+#endif
 
 
+#ifndef LUA_SANDBOX
 static int luaB_loadfile (lua_State *L) {
   const char *fname = luaL_optstring(L, 1, NULL);
   const char *mode = luaL_optstring(L, 2, NULL);
@@ -307,6 +311,7 @@ static int luaB_loadfile (lua_State *L) {
   int status = luaL_loadfilex(L, fname, mode);
   return load_aux(L, status, env);
 }
+#endif
 
 
 /*
@@ -330,6 +335,7 @@ static int luaB_loadfile (lua_State *L) {
 ** stack top. Instead, it keeps its resulting string in a
 ** reserved slot inside the stack.
 */
+#ifndef LUA_SANDBOX
 static const char *generic_reader (lua_State *L, void *ud, size_t *size) {
   (void)(ud);  /* not used */
   luaL_checkstack(L, 2, "too many nested functions");
@@ -345,8 +351,10 @@ static const char *generic_reader (lua_State *L, void *ud, size_t *size) {
   lua_replace(L, RESERVEDSLOT);  /* save string in reserved slot */
   return lua_tolstring(L, RESERVEDSLOT, size);
 }
+#endif
 
 
+#ifndef LUA_SANDBOX
 static int luaB_load (lua_State *L) {
   int status;
   size_t l;
@@ -365,16 +373,20 @@ static int luaB_load (lua_State *L) {
   }
   return load_aux(L, status, env);
 }
+#endif
 
 /* }====================================================== */
 
 
+#ifndef LUA_SANDBOX
 static int dofilecont (lua_State *L, int d1, lua_KContext d2) {
   (void)d1;  (void)d2;  /* only to match 'lua_Kfunction' prototype */
   return lua_gettop(L) - 1;
 }
+#endif
 
 
+#ifndef LUA_SANDBOX
 static int luaB_dofile (lua_State *L) {
   const char *fname = luaL_optstring(L, 1, NULL);
   lua_settop(L, 1);
@@ -383,6 +395,7 @@ static int luaB_dofile (lua_State *L) {
   lua_callk(L, 0, LUA_MULTRET, 0, dofilecont);
   return dofilecont(L, 0, 0);
 }
+#endif
 
 
 static int luaB_assert (lua_State *L) {
@@ -468,15 +481,19 @@ static int luaB_tostring (lua_State *L) {
 
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
+#ifndef LUA_SANDBOX
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
+#endif
   {"error", luaB_error},
   {"getmetatable", luaB_getmetatable},
   {"ipairs", luaB_ipairs},
+#ifndef LUA_SANDBOX
   {"loadfile", luaB_loadfile},
   {"load", luaB_load},
 #if defined(LUA_COMPAT_LOADSTRING)
   {"loadstring", luaB_load},
+#endif
 #endif
   {"next", luaB_next},
   {"pairs", luaB_pairs},

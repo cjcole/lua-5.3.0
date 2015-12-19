@@ -236,6 +236,7 @@ static lua_Number lua_strx2number (const char *s, char **endptr) {
 /* }====================================================== */
 
 
+#ifndef LUA_NO_REAL
 static const char *l_str2d (const char *s, lua_Number *result) {
   char *endptr;
   if (strpbrk(s, "nN"))  /* reject 'inf' and 'nan' */
@@ -248,7 +249,7 @@ static const char *l_str2d (const char *s, lua_Number *result) {
   while (lisspace(cast_uchar(*endptr))) endptr++;
   return (*endptr == '\0' ? endptr : NULL);  /* OK if no trailing characters */
 }
-
+#endif
 
 static const char *l_str2int (const char *s, lua_Integer *result) {
   lua_Unsigned a = 0;
@@ -280,14 +281,19 @@ static const char *l_str2int (const char *s, lua_Integer *result) {
 
 
 size_t luaO_str2num (const char *s, TValue *o) {
-  lua_Integer i; lua_Number n;
+  lua_Integer i;
+#ifndef LUA_NO_REAL
+  lua_Number n;
+#endif
   const char *e;
   if ((e = l_str2int(s, &i)) != NULL) {  /* try as an integer */
     setivalue(o, i);
   }
+#ifndef LUA_NO_REAL
   else if ((e = l_str2d(s, &n)) != NULL) {  /* else try as a float */
     setfltvalue(o, n);
   }
+#endif
   else
     return 0;  /* conversion failed */
   return (e - s + 1);  /* success; return string size */

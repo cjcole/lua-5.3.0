@@ -174,13 +174,16 @@ static int str_char (lua_State *L) {
 }
 
 
+#ifndef LUA_SANDBOX
 static int writer (lua_State *L, const void *b, size_t size, void *B) {
   (void)L;
   luaL_addlstring((luaL_Buffer *) B, (const char *)b, size);
   return 0;
 }
+#endif
 
 
+#ifndef LUA_SANDBOX
 static int str_dump (lua_State *L) {
   luaL_Buffer b;
   int strip = lua_toboolean(L, 2);
@@ -192,7 +195,7 @@ static int str_dump (lua_State *L) {
   luaL_pushresult(&b);
   return 1;
 }
-
+#endif
 
 
 /*
@@ -1012,7 +1015,9 @@ typedef struct Header {
 typedef enum KOption {
   Kint,		/* signed integers */
   Kuint,	/* unsigned integers */
+#ifndef LUA_NO_REAL
   Kfloat,	/* floating-point numbers */
+#endif
   Kchar,	/* fixed-length strings */
   Kstring,	/* strings with prefixed length */
   Kzstr,	/* zero-terminated strings */
@@ -1080,9 +1085,11 @@ static KOption getoption (Header *h, const char **fmt, int *size) {
     case 'j': *size = sizeof(lua_Integer); return Kint;
     case 'J': *size = sizeof(lua_Integer); return Kuint;
     case 'T': *size = sizeof(size_t); return Kuint;
+#ifndef LUA_NO_REAL
     case 'f': *size = sizeof(float); return Kfloat;
     case 'd': *size = sizeof(double); return Kfloat;
     case 'n': *size = sizeof(lua_Number); return Kfloat;
+#endif
     case 'i': *size = getnumlimit(h, fmt, sizeof(int)); return Kint;
     case 'I': *size = getnumlimit(h, fmt, sizeof(int)); return Kuint;
     case 's': *size = getnumlimit(h, fmt, sizeof(size_t)); return Kstring;
@@ -1158,6 +1165,7 @@ static void packint (luaL_Buffer *b, lua_Unsigned n,
 }
 
 
+#ifndef LUA_NO_REAL
 /*
 ** Copy 'size' bytes from 'src' to 'dest', correcting endianness if
 ** given 'islittle' is different from native endianness.
@@ -1174,6 +1182,7 @@ static void copywithendian (volatile char *dest, volatile const char *src,
       *(dest--) = *(src++);
   }
 }
+#endif
 
 
 static int str_pack (lua_State *L) {
@@ -1210,6 +1219,7 @@ static int str_pack (lua_State *L) {
         packint(&b, (lua_Unsigned)n, h.islittle, size, 0);
         break;
       }
+#ifndef LUA_NO_REAL
       case Kfloat: {  /* floating-point options */
         volatile Ftypes u;
         char *buff = luaL_prepbuffsize(&b, size);
@@ -1222,7 +1232,8 @@ static int str_pack (lua_State *L) {
         luaL_addsize(&b, size);
         break;
       }
-      case Kchar: {  /* fixed-size string */
+#endif
+    case Kchar: {  /* fixed-size string */
         size_t len;
         const char *s = luaL_checklstring(L, arg, &len);
         luaL_argcheck(L, len == (size_t)size, arg, "wrong length");
@@ -1345,6 +1356,7 @@ static int str_unpack (lua_State *L) {
         lua_pushinteger(L, res);
         break;
       }
+#ifndef LUA_NO_REAL
       case Kfloat: {
         volatile Ftypes u;
         lua_Number num;
@@ -1355,7 +1367,8 @@ static int str_unpack (lua_State *L) {
         lua_pushnumber(L, num);
         break;
       }
-      case Kchar: {
+#endif
+    case Kchar: {
         lua_pushlstring(L, data + pos, size);
         break;
       }
@@ -1388,7 +1401,9 @@ static int str_unpack (lua_State *L) {
 static const luaL_Reg strlib[] = {
   {"byte", str_byte},
   {"char", str_char},
+#ifndef LUA_SANDBOX
   {"dump", str_dump},
+#endif
   {"find", str_find},
   {"format", str_format},
   {"gmatch", gmatch},
@@ -1427,4 +1442,3 @@ LUAMOD_API int luaopen_string (lua_State *L) {
   createmetatable(L);
   return 1;
 }
-

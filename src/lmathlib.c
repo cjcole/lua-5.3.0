@@ -18,6 +18,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+#ifndef LUA_NO_REAL
 
 #undef PI
 #define PI	(l_mathop(3.141592653589793238462643383279502884))
@@ -385,11 +386,13 @@ static const luaL_Reg mathlib[] = {
   {NULL, NULL}
 };
 
+#endif /* #ifndef LUA_NO_REAL */
 
 /*
 ** Open math library
 */
 LUAMOD_API int luaopen_math (lua_State *L) {
+#ifndef LUA_NO_REAL
   luaL_newlib(L, mathlib);
   lua_pushnumber(L, PI);
   lua_setfield(L, -2, "pi");
@@ -399,6 +402,9 @@ LUAMOD_API int luaopen_math (lua_State *L) {
   lua_setfield(L, -2, "maxinteger");
   lua_pushinteger(L, LUA_MININTEGER);
   lua_setfield(L, -2, "mininteger");
+#else /* #ifndef LUA_NO_REAL */
+  (void)L;
+#endif /* #ifndef LUA_NO_REAL */
   return 1;
 }
 
