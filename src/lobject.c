@@ -333,7 +333,7 @@ void luaO_tostring (lua_State *L, StkId obj) {
     len = lua_integer2str(buff, ivalue(obj));
   else {
     len = lua_number2str(buff, fltvalue(obj));
-#if !defined(LUA_COMPAT_FLOATSTRING)
+#if !defined(LUA_COMPAT_FLOATSTRING) && !defined(LUA_NO_REAL)
     if (buff[strspn(buff, "-0123456789")] == '\0') {  /* looks like an int? */
       buff[len++] = '.';
       buff[len++] = '0';  /* adds '.0' to result */

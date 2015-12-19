@@ -467,7 +467,9 @@
 #define LUA_NUMBER_FRMLEN       LUA_INTEGER_FRMLEN
 #define LUA_NUMBER_FMT		LUA_INTEGER_FMT
 
-#define l_mathop(op)		op
+#define l_mathop(op)		op##_no_real
+#define floor_no_real(i) (i)
+#define fmod_no_real(a,b) ((a)%(b))
 
 #define lua_str2number(s,p) lua_str2integer(s,p)
 #define lua_strx2number(s,p) lua_strx2integer(s,p)

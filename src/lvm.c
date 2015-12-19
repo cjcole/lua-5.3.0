@@ -81,7 +81,6 @@ int luaV_tonumber_ (const TValue *obj, lua_Number *n) {
     return 0;  /* conversion failed */
 }
 
-
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
 ** mode == 0: accepts only integral values
