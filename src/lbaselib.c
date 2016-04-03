@@ -486,7 +486,9 @@ static const luaL_Reg base_funcs[] = {
   {"dofile", luaB_dofile},
 #endif
   {"error", luaB_error},
+#ifndef LUA_SANDBOX
   {"getmetatable", luaB_getmetatable},
+#endif
   {"ipairs", luaB_ipairs},
 #ifndef LUA_SANDBOX
   {"loadfile", luaB_loadfile},
@@ -498,13 +500,17 @@ static const luaL_Reg base_funcs[] = {
   {"next", luaB_next},
   {"pairs", luaB_pairs},
   {"pcall", luaB_pcall},
+#ifndef LUA_SANDBOX
   {"print", luaB_print},
   {"rawequal", luaB_rawequal},
   {"rawlen", luaB_rawlen},
   {"rawget", luaB_rawget},
   {"rawset", luaB_rawset},
+#endif
   {"select", luaB_select},
+#ifndef LUA_SANDBOX
   {"setmetatable", luaB_setmetatable},
+#endif
   {"tonumber", luaB_tonumber},
   {"tostring", luaB_tostring},
   {"xpcall", luaB_xpcall},
